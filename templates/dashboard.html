@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progress Dashboard — AI Mock Interview Assistant</title>
+  <meta name="description" content="Track your interview performance, skill mastery radar, score progression, confidence trends, and personalized growth recommendations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: rgba(17, 23, 38, 0.84);
+      --surface2: rgba(24, 34, 56, 0.78);
+      --surface3: rgba(34, 48, 78, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-g: #8b5cf6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #64748b;
+      --text-sub: #94a3b8;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background-color: #080c15;
+      background-image: 
+        radial-gradient(ellipse at 50% 20%, rgba(9, 13, 22, 0.45) 0%, rgba(9, 13, 22, 0.82) 100%),
+        url('/static/wallpaper.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glow */
+    .bg-canvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .glow-orb {
+      position: absolute; border-radius: 50%; filter: blur(110px); opacity: 0.09;
+    }
+    .orb-1 { width: 500px; height: 500px; background: var(--primary); top: -140px; left: -100px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--accent); bottom: -100px; right: -100px; }
+
+    .app-shell {
+      position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column;
+    }
+
+    /* Navbar */
+    header.navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 36px;
+      background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text);
+      font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em;
+    }
+    .brand-badge {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-g));
+      display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+    }
+    .nav-links { display: flex; gap: 10px; align-items: center; }
+    .nav-item {
+      padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600;
+      color: var(--text-sub); text-decoration: none; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--text); background: rgba(255, 255, 255, 0.05); border-color: var(--border);
+    }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15));
+      border-color: rgba(99, 102, 241, 0.35); color: var(--text);
+    }
+
+    .btn {
+      font-family: inherit; font-size: 0.875rem; font-weight: 600; padding: 9px 18px;
+      border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-g)); color: white;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
+    .btn-ghost {
+      background: transparent; color: var(--text-sub); border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--primary); color: var(--text); background: rgba(99,102,241,0.08); }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      max-width: 1300px; margin: 0 auto; padding: 40px 32px 64px; width: 100%;
+    }
+
+    .dash-header {
+      display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+    }
+    .dash-header h1 {
+      font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px;
+    }
+    .dash-header p { color: var(--text-sub); font-size: 0.95rem; }
+
+    /* KPI Cards Grid */
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 22px; position: relative; overflow: hidden;
+    }
+    .kpi-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent)); opacity: 0.8;
+    }
+    .kpi-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .kpi-value {
+      font-size: 2.2rem; font-weight: 800; color: var(--text); line-height: 1.1; margin-bottom: 6px;
+    }
+    .kpi-badge {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 100px;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;
+    }
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-panel {
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; display: flex; flex-direction: column;
+    }
+    .panel-title {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text-muted); margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .chart-box { position: relative; flex: 1; min-height: 280px; }
+
+    /* Domain Mastery Cards */
+    .section-title {
+      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 18px;
+    }
+    .domains-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 36px;
+    }
+    .domain-card {
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 18px; transition: transform 0.2s, border-color 0.2s;
+    }
+    .domain-card:hover { transform: translateY(-2px); border-color: rgba(99, 102, 241, 0.4); }
+    .d-card-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+    }
+    .d-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .d-stats-row {
+      display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 8px;
+    }
+    .d-bar-track {
+      height: 6px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-top: 4px;
+    }
+    .d-bar-fill {
+      height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.8s ease;
+    }
+
+    /* Insights Dual Panel */
+    .insights-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 36px;
+    }
+    @media (max-width: 768px) { .insights-grid { grid-template-columns: 1fr; } }
+    .insight-card {
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius); padding: 22px;
+    }
+    .insight-card.strength-border { border-left: 4px solid var(--success); }
+    .insight-card.improve-border { border-left: 4px solid var(--warning); }
+    .insight-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .insight-item {
+      display: flex; align-items: flex-start; gap: 8px; font-size: 0.875rem; color: var(--text-sub); line-height: 1.5;
+    }
+
+    /* Recent Sessions Feed */
+    .table-panel {
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; overflow-x: auto;
+    }
+    table.data-table {
+      width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;
+    }
+    table.data-table th {
+      padding: 12px 16px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); border-bottom: 1px solid var(--border);
+    }
+    table.data-table td {
+      padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text-sub);
+    }
+    table.data-table tr:hover td { background: var(--surface2); color: var(--text); }
+
+    /* Empty state */
+    .empty-banner {
+      text-align: center; padding: 60px 24px; background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius); margin-bottom: 32px;
+    }
+    .empty-banner h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; }
+    .empty-banner p { color: var(--text-sub); font-size: 0.9rem; max-width: 440px; margin: 0 auto 20px; }
+
+    footer {
+      text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem;
+      border-top: 1px solid var(--border); margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+</div>
+
+<div class="app-shell">
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <img src="/static/logo.svg" alt="Logo" width="40" height="40" style="border-radius:12px;box-shadow:var(--glow);flex-shrink:0;" />
+      <span>AI Mock Interview Assistant</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/" class="nav-item">🎯 Practice</a>
+      <a href="/dashboard" class="nav-item active">📈 Progress Dashboard</a>
+      <a href="/history" class="nav-item">📊 History</a>
+      <button class="btn btn-ghost" onclick="window.print()" title="Print or save PDF dashboard">🖨️ Print Report</button>
+      <a href="/api/history/export" class="btn btn-ghost" title="Download raw JSON report">⬇ Export JSON</a>
+    </nav>
+  </header>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+
+    <div class="dash-header">
+      <div>
+        <h1>📈 Candidate Performance & Readiness Dashboard</h1>
+        <p>Continuous readiness analytics, speech cadence tracking, STAR framework mastery, and personalized growth insights.</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="window.print()">🖨️ Export PDF</button>
+        <a href="/" class="btn btn-primary">🚀 Start New Practice Session</a>
+      </div>
+    </div>
+
+    <!-- Empty State Warning if no sessions -->
+    <div id="empty-state" class="empty-banner" style="display:none;">
+      <div style="font-size:2.6rem;margin-bottom:12px;">📊</div>
+      <h3>No Interview Sessions Completed Yet</h3>
+      <p>Start practicing answers to see your score progression, speaking pace (WPM), STAR structure, and readiness index!</p>
+      <a href="/" class="btn btn-primary">Begin First Interview</a>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div id="dashboard-content">
+
+      <!-- KPI Summary Cards Grid (6 High-Impact Metrics) -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Interview Readiness Index <span>🏆</span></div>
+          <div class="kpi-value" id="kpi-readiness">0%</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span class="kpi-badge" id="kpi-readiness-badge" style="background:rgba(99,102,241,0.15);color:var(--primary-light);">Evaluating</span>
+            <span id="kpi-readiness-tier" style="font-size:0.75rem;font-weight:700;color:var(--accent);">Mid-Level Caliber</span>
+            <span id="kpi-next-milestone" style="font-size:0.68rem;color:var(--text-muted);line-height:1.3;">Target: 80% for Senior Caliber</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Average Performance <span>🎯</span></div>
+          <div class="kpi-value" id="kpi-avg-score">0%</div>
+          <span class="kpi-badge" id="kpi-best-score" style="background:rgba(16,185,129,0.15);color:var(--success);">Best: 0%</span>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Speaking Rate (Cadence) <span>🎙️</span></div>
+          <div class="kpi-value" id="kpi-avg-wpm">135 <span style="font-size:1rem;color:var(--text-sub);">WPM</span></div>
+          <span class="kpi-badge" id="kpi-wpm-badge" style="background:rgba(6,182,212,0.15);color:var(--accent);">Optimal Cadence</span>
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;" id="kpi-fpm-sub">Avg Filler Rate: 0.0 FPM</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">STAR Method Compliance <span>⭐</span></div>
+          <div class="kpi-value" id="kpi-avg-star">75%</div>
+          <span class="kpi-badge" id="kpi-star-badge" style="background:rgba(245,158,11,0.15);color:var(--warning);">Structured Framing</span>
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">Situation • Task • Action • Result</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Average Confidence <span>⚡</span></div>
+          <div class="kpi-value" id="kpi-avg-conf">0%</div>
+          <span class="kpi-badge" id="kpi-conf-level" style="background:rgba(16,185,129,0.15);color:var(--success);">High Conviction</span>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Answers Evaluated <span>📝</span></div>
+          <div class="kpi-value" id="kpi-total-answers">0</div>
+          <span class="kpi-badge" style="background:rgba(255,255,255,0.06);color:var(--text-sub);">All Sessions</span>
+        </div>
+      </div>
+
+      <!-- Charts Row 1: Trend line + Skill Dimensions Radar -->
+      <div class="charts-grid">
+        <div class="chart-panel">
+          <div class="panel-title">
+            <span>Score & Speaking Pace Progression</span>
+            <span style="font-size:0.7rem;color:var(--text-muted);">Scores (%) vs Cadence (WPM)</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <div class="panel-title">
+            <span>Competency Dimensions Radar</span>
+            <span style="font-size:0.7rem;color:var(--text-muted);">5 Core Dimensions</span>
+          </div>
+          <div class="chart-box">
+            <canvas id="competencyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Domain Mastery Section -->
+      <h3 class="section-title">Domain Skill Mastery</h3>
+      <div class="domains-grid" id="domains-grid"></div>
+
+      <!-- Growth Insights (Strengths vs Improvements) -->
+      <div class="insights-grid">
+        <div class="insight-card strength-border">
+          <h4 style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--success);">
+            🌟 Frequently Identified Strengths
+          </h4>
+          <div class="insight-list" id="strengths-feed">
+            <div class="insight-item"><span style="color:var(--success);">✓</span> Consistent technical clarity and domain knowledge.</div>
+          </div>
+        </div>
+
+        <div class="insight-card improve-border">
+          <h4 style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--warning);">
+            🎯 Key Growth Focus Areas
+          </h4>
+          <div class="insight-list" id="improvements-feed">
+            <div class="insight-item"><span style="color:var(--warning);">→</span> Address missing architectural trade-offs and edge-cases.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Practice Activity Table -->
+      <div class="table-panel">
+        <h3 class="section-title" style="margin-bottom:16px;">Recent Practice Sessions</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Domain</th>
+              <th>Question</th>
+              <th>Score</th>
+              <th>Grade</th>
+              <th>Pace (WPM)</th>
+              <th>STAR %</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody id="recent-tbody"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:34px 24px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.84rem;text-align:center;">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);font-size:1rem;flex-wrap:wrap;justify-content:center;">
+      <img src="/static/logo.svg" alt="Logo" width="28" height="28" style="border-radius:8px;" />
+      <span>AI Mock Interview Assistant</span>
+      <span style="opacity:0.35;">||</span>
+      <span style="color:var(--primary-light);">DATA ALCOTT || SYSTEMS</span>
+    </div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;font-size:0.82rem;align-items:center;">
+      <a href="https://www.dataalcott.com/" target="_blank" rel="noopener noreferrer" style="color:var(--text-sub);text-decoration:none;">DATA ALCOTT SYSTEMS</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="https://www.freeinternships.in/" target="_blank" rel="noopener noreferrer" style="color:var(--text-sub);text-decoration:none;">www.freeinternships.in</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="tel:9600095045" style="color:var(--text-sub);text-decoration:none;">📞 9600095045</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="mailto:mail@freeinternships.in" style="color:var(--text-sub);text-decoration:none;">✉️ mail@freeinternships.in</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="https://www.freeinternships.in/register.php" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700;text-decoration:none;">🎓 Free Online AI &amp; Data Science Internship - Apply Now!</a>
+    </div>
+    <div style="font-size:0.75rem;opacity:0.7;">
+      AI Mock Interview Assistant Dashboard — Powered by Gemini AI &amp; spaCy NLP • <a href="/history" style="color:var(--primary-light);">Full History</a> • <a href="/" style="color:var(--primary-light);">Practice Mode</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+let trendChartInstance = null;
+let competencyChartInstance = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadDashboardData();
+});
+
+async function loadDashboardData() {
+  try {
+    const res = await fetch('/api/dashboard/stats');
+    const data = await res.json();
+
+    if (!data || data.total_answers === 0) {
+      document.getElementById('empty-state').style.display = 'block';
+      document.getElementById('dashboard-content').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('dashboard-content').style.display = 'block';
+
+    // 1. Populate KPIs
+    document.getElementById('kpi-total-answers').textContent = data.total_answers;
+    document.getElementById('kpi-avg-score').textContent = `${data.avg_score}%`;
+    document.getElementById('kpi-best-score').textContent = `Best: ${data.best_score}%`;
+    document.getElementById('kpi-avg-conf').textContent = `${data.avg_confidence}%`;
+
+    // Speech and STAR Metrics
+    const avgWpm = data.avg_wpm || 135;
+    const avgFpm = data.avg_fpm !== undefined ? data.avg_fpm : 0.0;
+    const avgStar = data.avg_star_score !== undefined ? data.avg_star_score : 75;
+
+    document.getElementById('kpi-avg-wpm').innerHTML = `${avgWpm} <span style="font-size:1rem;color:var(--text-sub);">WPM</span>`;
+    const wpmBadge = document.getElementById('kpi-wpm-badge');
+    if (avgWpm >= 110 && avgWpm <= 165) {
+      wpmBadge.textContent = 'Optimal Cadence (110-165)';
+      wpmBadge.style.background = 'rgba(16,185,129,0.15)';
+      wpmBadge.style.color = 'var(--success)';
+    } else if (avgWpm > 165) {
+      wpmBadge.textContent = 'Rapid Pace (>165 WPM)';
+      wpmBadge.style.background = 'rgba(245,158,11,0.15)';
+      wpmBadge.style.color = 'var(--warning)';
+    } else {
+      wpmBadge.textContent = 'Deliberate / Slow (<110)';
+      wpmBadge.style.background = 'rgba(99,102,241,0.15)';
+      wpmBadge.style.color = 'var(--primary-light)';
+    }
+    document.getElementById('kpi-fpm-sub').textContent = `Avg Filler Rate: ${avgFpm} FPM`;
+
+    document.getElementById('kpi-avg-star').textContent = `${avgStar}%`;
+    const starBadge = document.getElementById('kpi-star-badge');
+    if (avgStar >= 80) {
+      starBadge.textContent = 'Strong STAR Framing';
+      starBadge.style.background = 'rgba(16,185,129,0.15)';
+      starBadge.style.color = 'var(--success)';
+    } else if (avgStar >= 60) {
+      starBadge.textContent = 'Structured Storytelling';
+      starBadge.style.background = 'rgba(6,182,212,0.15)';
+      starBadge.style.color = 'var(--accent)';
+    } else {
+      starBadge.textContent = 'Include Measurable Results';
+      starBadge.style.background = 'rgba(245,158,11,0.15)';
+      starBadge.style.color = 'var(--warning)';
+    }
+
+    // Readiness & Caliber Tier
+    const readiness = data.readiness_index || 70;
+    document.getElementById('kpi-readiness').textContent = `${readiness}%`;
+    const rBadge = document.getElementById('kpi-readiness-badge');
+    if (readiness >= 80) {
+      rBadge.textContent = '🌟 Interview Ready';
+      rBadge.style.background = 'rgba(16,185,129,0.15)';
+      rBadge.style.color = 'var(--success)';
+    } else if (readiness >= 60) {
+      rBadge.textContent = '🚀 Strong Progression';
+      rBadge.style.background = 'rgba(6,182,212,0.15)';
+      rBadge.style.color = 'var(--accent)';
+    } else {
+      rBadge.textContent = '📚 Building Foundations';
+      rBadge.style.background = 'rgba(245,158,11,0.15)';
+      rBadge.style.color = 'var(--warning)';
+    }
+
+    const tierEl = document.getElementById('kpi-readiness-tier');
+    if (tierEl) {
+      tierEl.textContent = data.readiness_tier || (readiness >= 80 ? 'Senior / Staff Caliber' : readiness >= 65 ? 'Mid-Level Professional' : 'Foundational / Junior');
+      if (data.tier_color) tierEl.style.color = data.tier_color;
+    }
+    const nextMilestoneEl = document.getElementById('kpi-next-milestone');
+    if (nextMilestoneEl) {
+      nextMilestoneEl.textContent = data.next_milestone || 'Target: Maintain >80% score across 5 consecutive questions';
+    }
+
+    // 2. Render Progression Trend Chart with Dual Axis (Scores & WPM)
+    renderTrendChart(data.trends || []);
+
+    // 3. Render Competency Dimensions Radar (5 Dimensions)
+    renderCompetencyChart(data.skill_breakdown || {}, avgStar);
+
+    // 4. Render Domain Mastery Cards
+    renderDomainCards(data.domains_mastery || {});
+
+    // 5. Strengths & Improvements
+    renderInsights(data.common_strengths || [], data.common_improvements || []);
+
+    // 6. Recent Sessions Table
+    renderRecentTable(data.recent_activity || []);
+
+  } catch (e) {
+    console.error('Failed to load dashboard data:', e);
+  }
+}
+
+function renderTrendChart(trends) {
+  const ctx = document.getElementById('trendChart');
+  if (!ctx) return;
+
+  const labels = trends.map((t, idx) => `Session #${idx + 1}`);
+  const scores = trends.map(t => t.score);
+  const confidences = trends.map(t => t.confidence);
+  const wpms = trends.map(t => t.wpm || 135);
+
+  if (trendChartInstance) trendChartInstance.destroy();
+
+  trendChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Overall Score (%)',
+          data: scores,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.15)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#6366f1',
+          yAxisID: 'y',
+        },
+        {
+          label: 'Confidence (%)',
+          data: confidences,
+          borderColor: '#06b6d4',
+          backgroundColor: 'transparent',
+          borderDash: [5, 5],
+          tension: 0.35,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#06b6d4',
+          yAxisID: 'y',
+        },
+        {
+          label: 'Speaking Rate (WPM)',
+          data: wpms,
+          borderColor: '#10b981',
+          backgroundColor: 'transparent',
+          tension: 0.35,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#10b981',
+          yAxisID: 'y1',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { color: '#64748b' },
+          title: { display: true, text: 'Score & Confidence (%)', color: '#64748b', font: { size: 10 } }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          min: 60,
+          max: 220,
+          grid: { drawOnChartArea: false },
+          ticks: { color: '#10b981' },
+          title: { display: true, text: 'Cadence (WPM)', color: '#10b981', font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#64748b' }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', weight: '600' } }
+        }
+      }
+    }
+  });
+}
+
+function renderCompetencyChart(breakdown, avgStar) {
+  const ctx = document.getElementById('competencyChart');
+  if (!ctx) return;
+
+  if (competencyChartInstance) competencyChartInstance.destroy();
+
+  competencyChartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Keyword Coverage', 'Technical Depth', 'Communication', 'Delivery & Tone', 'STAR Structure'],
+      datasets: [{
+        label: 'Candidate Mastery (%)',
+        data: [
+          breakdown.keyword_coverage || 72,
+          breakdown.technical_depth || 74,
+          breakdown.communication_structure || 80,
+          breakdown.confidence_delivery || 75,
+          avgStar || 75
+        ],
+        backgroundColor: 'rgba(6, 182, 212, 0.2)',
+        borderColor: '#06b6d4',
+        borderWidth: 2,
+        pointBackgroundColor: '#06b6d4',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: { display: false, stepSize: 20 },
+          grid: { color: 'rgba(255, 255, 255, 0.08)' },
+          pointLabels: { color: '#94a3b8', font: { size: 10, weight: '600' } }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+function renderDomainCards(mastery) {
+  const grid = document.getElementById('domains-grid');
+  grid.innerHTML = '';
+
+  const domainIcons = {
+    software_engineering: '💻',
+    data_science: '📊',
+    product_management: '🗂️',
+    behavioral: '🧠',
+    python_developer: '🐍',
+    forensic_science: '🔬',
+  };
+
+  const entries = Object.entries(mastery);
+  if (!entries.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">No domain data available yet.</div>';
+    return;
+  }
+
+  entries.forEach(([key, info]) => {
+    const icon = domainIcons[key] || '📁';
+    const avg = info.avg || 0;
+    const count = info.count || 0;
+    const best = info.best || 0;
+
+    let badgeText = 'Proficient';
+    let badgeColor = 'rgba(6,182,212,0.15);color:var(--accent);';
+    if (avg >= 80) {
+      badgeText = 'Mastered';
+      badgeColor = 'rgba(16,185,129,0.15);color:var(--success);';
+    } else if (avg < 60) {
+      badgeText = 'Needs Practice';
+      badgeColor = 'rgba(245,158,11,0.15);color:var(--warning);';
+    }
+
+    grid.innerHTML += `
+      <div class="domain-card">
+        <div class="d-card-header">
+          <span class="d-name">${icon} ${info.name}</span>
+          <span style="font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:100px;background:${badgeColor}">${badgeText}</span>
+        </div>
+        <div class="d-stats-row">
+          <span>${count} question${count !== 1 ? 's' : ''} practiced</span>
+          <span>Best: <strong style="color:var(--text);">${best}%</strong></span>
+        </div>
+        <div class="d-stats-row" style="margin-bottom:4px;">
+          <span>Average Score</span>
+          <span style="font-weight:700;color:var(--text);">${avg}%</span>
+        </div>
+        <div class="d-bar-track">
+          <div class="d-bar-fill" style="width: ${avg}%;"></div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderInsights(strengths, improvements) {
+  const sContainer = document.getElementById('strengths-feed');
+  const iContainer = document.getElementById('improvements-feed');
+
+  if (strengths.length) {
+    sContainer.innerHTML = strengths.map(s => `
+      <div class="insight-item"><span style="color:var(--success);">✓</span><span>${s}</span></div>
+    `).join('');
+  }
+
+  if (improvements.length) {
+    iContainer.innerHTML = improvements.map(i => `
+      <div class="insight-item"><span style="color:var(--warning);">→</span><span>${i}</span></div>
+    `).join('');
+  }
+}
+
+function renderRecentTable(sessions) {
+  const tbody = document.getElementById('recent-tbody');
+  tbody.innerHTML = '';
+  if (!sessions.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No sessions recorded.</td></tr>';
+    return;
+  }
+
+  sessions.forEach(s => {
+    const date = s.timestamp ? s.timestamp.substring(0, 10) : '—';
+    const score = s.score !== undefined ? s.score : 0;
+    const grade = s.grade || 'Good';
+    const conf = s.confidence?.score ? `${s.confidence.score}%` : '—';
+    const domain = s.domain_label || (s.domain ? s.domain.replace('_', ' ') : 'General');
+    const qShort = (s.question || '').substring(0, 52) + '…';
+    const wpm = s.speech_analysis?.wpm || (s.wpm !== undefined ? s.wpm : 135);
+    const starScore = s.star_analysis?.star_score || 75;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${date}</td>
+        <td><strong>${domain}</strong></td>
+        <td>${qShort}</td>
+        <td><strong style="color:${score >= 75 ? 'var(--success)' : score >= 50 ? 'var(--accent)' : 'var(--danger)'};">${score}%</strong></td>
+        <td><span style="font-size:0.75rem;padding:2px 8px;border-radius:100px;background:rgba(255,255,255,0.06);">${grade}</span></td>
+        <td><span class="tag tag-domain" style="font-size:0.72rem;padding:2px 6px;">🎙️ ${wpm} WPM</span></td>
+        <td><span class="tag tag-easy" style="font-size:0.72rem;padding:2px 6px;">⭐ ${starScore}%</span></td>
+        <td>${conf}</td>
+      </tr>
+    `;
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,552 @@
+{
+  "software_engineering": [
+    {
+      "id": "se_1",
+      "text": "Explain the SOLID principles and give an example of how you've applied one in a real project.",
+      "difficulty": "Medium",
+      "keywords": [
+        "single responsibility",
+        "open closed",
+        "liskov",
+        "interface segregation",
+        "dependency inversion",
+        "design",
+        "principle"
+      ],
+      "tips": "State each letter of the acronym clearly, then dive deep into a concrete scenario like refactoring a monolithic class into distinct services.",
+      "model_answer": "SOLID stands for Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion. For instance, in an e-commerce checkout service, I applied the Single Responsibility Principle by decoupling payment processing, tax calculation, and email notification into dedicated classes rather than one bloated manager. Furthermore, applying Dependency Inversion with payment interfaces enabled seamless swapping between Stripe and PayPal providers without modifying business logic."
+    },
+    {
+      "id": "se_2",
+      "text": "What is the difference between a process and a thread? When would you use one over the other?",
+      "difficulty": "Easy",
+      "keywords": [
+        "memory",
+        "concurrency",
+        "parallelism",
+        "context switch",
+        "synchronization",
+        "deadlock",
+        "GIL",
+        "lightweight"
+      ],
+      "tips": "Highlight separate address spaces vs shared memory, context switching overhead, and IPC vs thread synchronization.",
+      "model_answer": "A process is an independent execution unit with its own dedicated memory space, whereas a thread is a lightweight execution sub-unit within a process sharing the same address space and heap. Threads have lower creation and context switching overhead and allow fast inter-thread communication, but require synchronization to avoid race conditions and deadlocks. Processes provide complete fault isolation, making them preferable for CPU-heavy tasks or distributed microservices where memory separation prevents cascading failures."
+    },
+    {
+      "id": "se_3",
+      "text": "Describe how you would design a URL shortener service like bit.ly.",
+      "difficulty": "Hard",
+      "keywords": [
+        "hashing",
+        "database",
+        "cache",
+        "load balancer",
+        "scalability",
+        "redirect",
+        "collision",
+        "base62",
+        "CDN"
+      ],
+      "tips": "Structure using functional and non-functional requirements, data modeling, Base62 encoding, Redis caching, and 301 vs 302 redirects.",
+      "model_answer": "I would structure the URL shortener into an API gateway, a URL generation service, and a distributed datastore. For URL encoding, I would use an auto-incrementing 64-bit ID converted into Base62 to guarantee collision-free 7-character aliases. Read traffic would hit a Redis caching cluster holding the top 20% most accessed URLs with an LRU eviction policy. For redirects, returning an HTTP 302 Found preserves analytical tracking, while 301 Moved Permanently reduces server load through browser caching."
+    },
+    {
+      "id": "se_4",
+      "text": "What is the difference between REST and GraphQL? When would you choose one over the other?",
+      "difficulty": "Medium",
+      "keywords": [
+        "endpoint",
+        "overfetching",
+        "underfetching",
+        "schema",
+        "query",
+        "mutation",
+        "stateless",
+        "HTTP",
+        "flexibility"
+      ],
+      "tips": "Compare single flexible endpoint vs resource URIs, schema typing, over/underfetching, and caching complexities.",
+      "model_answer": "REST organizes APIs around fixed HTTP endpoints and methods, which can lead to overfetching or underfetching data across multiple round trips. GraphQL uses a single endpoint where clients request exact fields using strongly typed schemas. I choose REST for public APIs with robust HTTP/CDN caching and simple CRUD patterns, whereas I choose GraphQL for complex dashboard frontends or mobile apps that need aggregation across multiple backend microservices in a single round-trip."
+    },
+    {
+      "id": "se_5",
+      "text": "Explain Big O notation and analyze the time complexity of a binary search algorithm.",
+      "difficulty": "Easy",
+      "keywords": [
+        "O(log n)",
+        "divide",
+        "conquer",
+        "sorted",
+        "complexity",
+        "worst case",
+        "best case",
+        "space",
+        "iteration"
+      ],
+      "tips": "Clarify that Big O represents asymptotic upper bounds, explain why binary search halves the search space each step.",
+      "model_answer": "Big O notation mathematically describes the asymptotic upper bound of an algorithm's execution time or memory usage as input size n grows to infinity. Binary search requires a sorted array and operates via divide-and-conquer: each comparison cuts the remaining search space in half (n, n/2, n/4, ..., 1), resulting in O(log n) time complexity. Best-case time is O(1) when the target is at the middle element, while auxiliary space complexity is O(1) iteratively or O(log n) recursively due to the call stack."
+    },
+    {
+      "id": "se_6",
+      "text": "How do you handle distributed transactions across microservices using the Saga pattern?",
+      "difficulty": "Hard",
+      "keywords": [
+        "saga",
+        "choreography",
+        "orchestration",
+        "compensating transaction",
+        "idempotency",
+        "eventual consistency",
+        "rollback",
+        "event-driven"
+      ],
+      "tips": "Contrast Orchestration with Choreography, explain compensating transactions for rollback, and highlight idempotency for retries.",
+      "model_answer": "In microservices architectures with partitioned databases, traditional 2-phase commit creates severe availability and latency bottlenecks. The Saga pattern manages distributed transactions as a sequence of local transactions where each step publishes domain events that trigger downstream services. If any step fails, the saga executes backward compensating transactions to semantically undo preceding operations and achieve eventual consistency. In Choreography, services communicate via decentralized event streams (e.g., Kafka); in Orchestration, a centralized workflow coordinator (e.g., Temporal or Step Functions) commands each service and tracks state. To handle network partitions and message retries safely, all participants must implement idempotent event handlers."
+    },
+    {
+      "id": "se_7",
+      "text": "How do B-Tree and Hash indexes differ in relational databases, and what are the trade-offs of indexing?",
+      "difficulty": "Medium",
+      "keywords": [
+        "B-Tree",
+        "hash index",
+        "composite index",
+        "range query",
+        "table scan",
+        "query plan",
+        "write overhead",
+        "cardinality"
+      ],
+      "tips": "Explain why B-Trees support range queries and sorting while Hash indexes only support O(1) equality. Discuss INSERT/UPDATE write overhead.",
+      "model_answer": "A B-Tree (specifically B+Tree) stores sorted keys in a balanced tree where leaf nodes form a linked list, enabling O(log n) lookups as well as efficient range queries (BETWEEN, >, <), prefix matching, and ORDER BY sorting. A Hash index uses a hash table providing O(1) average lookup for exact equality (=), but cannot assist range queries or sorting. While indexes dramatically speed up SELECT queries, they incur trade-offs: every INSERT, UPDATE, and DELETE requires updating index trees and write-ahead logs, increasing write latency and consuming memory in the database buffer pool."
+    },
+    {
+      "id": "se_8",
+      "text": "Explain common caching strategies (Cache-Aside, Write-Through, Write-Behind) and how you mitigate a cache stampede.",
+      "difficulty": "Medium",
+      "keywords": [
+        "cache-aside",
+        "write-through",
+        "write-behind",
+        "cache stampede",
+        "thundering herd",
+        "TTL",
+        "redis",
+        "mutex",
+        "eviction"
+      ],
+      "tips": "Differentiate who writes to the datastore (application vs cache), and discuss distributed locks or probabilistic early expiration for thundering herds.",
+      "model_answer": "In Cache-Aside (Lazy Loading), the application checks the cache first; on a miss, it reads from the database and populates the cache. In Write-Through, writes update the cache and database synchronously, ensuring strong data consistency at the cost of higher write latency. In Write-Behind (Write-Back), writes are acknowledged immediately in cache and asynchronously flushed to disk in batches, maximizing throughput but risking data loss upon node crashes. To prevent a cache stampede (thundering herd) when a popular key expires, I use distributed mutex locks (e.g., Redis Redlock) so only a single thread refreshes the datastore, alongside randomized TTL jitter and probabilistic early expiration (XFetch)."
+    },
+    {
+      "id": "se_9",
+      "text": "What are the four Coffman conditions for deadlocks, and how do you prevent them in concurrent applications?",
+      "difficulty": "Medium",
+      "keywords": [
+        "deadlock",
+        "mutual exclusion",
+        "hold and wait",
+        "no preemption",
+        "circular wait",
+        "lock ordering",
+        "mutex",
+        "concurrency",
+        "optimistic locking"
+      ],
+      "tips": "Identify the four conditions: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait. Discuss lock ordering hierarchies and optimistic locking.",
+      "model_answer": "A deadlock requires four simultaneous Coffman conditions: 1) Mutual Exclusion (resources held exclusively), 2) Hold and Wait (processes holding resources while awaiting others), 3) No Preemption (resources cannot be forcibly revoked), and 4) Circular Wait (a closed loop of processes waiting for each other). The most reliable prevention technique is breaking Circular Wait by enforcing a strict global lock acquisition hierarchy (e.g., sorting resource IDs before acquiring locks). We can also eliminate Hold and Wait by requesting all resources atomically upfront, setting lock acquisition timeouts with exponential backoff, or adopting optimistic concurrency control with version numbers (ETags/row versions) to avoid pessimistic locking entirely."
+    },
+    {
+      "id": "se_10",
+      "text": "What architectural trade-offs do you evaluate when deciding between a modular monolith and microservices?",
+      "difficulty": "Medium",
+      "keywords": [
+        "monolith",
+        "microservices",
+        "bounded context",
+        "latency",
+        "network overhead",
+        "deployment",
+        "observability",
+        "Conway's Law",
+        "scalability"
+      ],
+      "tips": "Frame the decision around organizational maturity, team boundaries (Conway's Law), operational complexity, and data consistency.",
+      "model_answer": "A modular monolith offers simplicity, rapid iteration, zero network latency between modules, single-database ACID transactions, and straightforward deployments, making it the ideal choice for early-stage products and smaller teams. Microservices decouple deployment pipelines, enable independent horizontal scaling per service, and align with Conway's Law across autonomous domain teams. However, microservices introduce severe operational overhead: distributed tracing (OpenTelemetry), network latency, partial failures, circuit breakers, and eventual data consistency. The recommended path is starting with a well-structured monolith with clean bounded contexts, extracting services only when specific scaling limits or organizational bottlenecks justify the distributed complexity."
+    },
+    {
+      "id": "se_11",
+      "text": "How would you design a distributed API rate limiter? Compare Token Bucket, Leaky Bucket, and Sliding Window algorithms.",
+      "difficulty": "Hard",
+      "keywords": [
+        "rate limiting",
+        "token bucket",
+        "leaky bucket",
+        "sliding window",
+        "redis",
+        "atomic",
+        "burst traffic",
+        "Lua script",
+        "HTTP 429"
+      ],
+      "tips": "Explain how Token Bucket permits bursts, Leaky Bucket enforces constant output rate, and Sliding Window prevents boundary burst exploits with Redis Lua scripts.",
+      "model_answer": "A distributed rate limiter resides at the API Gateway layer to protect backend services from abusive traffic and DoS spikes, returning HTTP 429 Too Many Requests when thresholds are exceeded. The Token Bucket algorithm accumulates tokens at a constant rate up to bucket capacity, smoothly supporting burst traffic. The Leaky Bucket buffers incoming requests in a FIFO queue and processes them at a strict, constant egress rate, smoothing spiky traffic into a uniform flow. The Sliding Window Counter divides time windows into sub-buckets to eliminate the edge-of-window burst flaw inherent in fixed windows. In production, I implement sliding window rate limiting using Redis sorted sets (ZADD/ZREMRANGEBYSCORE) executed via atomic Lua scripts to prevent race conditions across distributed gateway instances."
+    },
+    {
+      "id": "se_12",
+      "text": "Explain OAuth 2.0 and OpenID Connect (OIDC). What are the security risks and best practices when handling JWTs?",
+      "difficulty": "Medium",
+      "keywords": [
+        "OAuth 2.0",
+        "OIDC",
+        "JWT",
+        "access token",
+        "refresh token",
+        "PKCE",
+        "authorization code",
+        "XSS",
+        "CSRF",
+        "HttpOnly"
+      ],
+      "tips": "Distinguish authorization (OAuth) from authentication (OIDC). Contrast storing tokens in localStorage (XSS risk) vs HttpOnly SameSite cookies.",
+      "model_answer": "OAuth 2.0 is an authorization framework allowing third-party applications delegated access to user resources without sharing user passwords. OpenID Connect (OIDC) is an identity layer on top of OAuth 2.0 that provides user authentication via cryptographically signed ID Tokens (JWTs). In the Authorization Code flow with PKCE, clients exchange authorization codes and cryptographic verifiers for access and refresh tokens. Storing JWTs in browser localStorage leaves them vulnerable to XSS theft; the recommended security practice is storing tokens in HttpOnly, Secure, SameSite cookies or using a Backend-For-Frontend (BFF) proxy. Furthermore, because stateless JWTs cannot be revoked on-demand without central lookup overhead, access tokens should have short lifespans (5–15 minutes) paired with rotating refresh tokens."
+    },
+    {
+      "id": "se_13",
+      "text": "What is the testing pyramid, and how do Blue-Green and Canary deployment strategies ensure zero downtime?",
+      "difficulty": "Easy",
+      "keywords": [
+        "CI/CD",
+        "unit test",
+        "integration test",
+        "end-to-end",
+        "blue-green",
+        "canary",
+        "zero downtime",
+        "rollback",
+        "health check",
+        "load balancer"
+      ],
+      "tips": "Detail the pyramid layers (Unit, Integration, E2E), and contrast Blue-Green (instant environment flip) with Canary (gradual traffic percentage rollout).",
+      "model_answer": "The testing pyramid advocates for a wide base of fast, automated unit tests, a moderate layer of integration tests verifying service contracts and databases, and a lean apex of end-to-end (E2E) browser/journey tests, maximizing test speed and ROI. In CI/CD pipelines, zero-downtime deployments prevent user interruption during updates. Blue-Green deployment runs two identical environments; new versions deploy to the idle Green environment, and once automated health checks pass, load balancer traffic switches 100% instantly from Blue to Green with instantaneous rollback capability. Canary deployment routes a tiny fraction (e.g., 2%–5%) of live production traffic to the new version, monitoring error budgets and latency metrics before incrementally promoting it to full rollout."
+    },
+    {
+      "id": "se_14",
+      "text": "Explain the CAP theorem and the PACELC extension. How do distributed databases trade off consistency and latency?",
+      "difficulty": "Medium",
+      "keywords": [
+        "CAP theorem",
+        "PACELC",
+        "consistency",
+        "availability",
+        "partition tolerance",
+        "eventual consistency",
+        "quorum",
+        "linearizability",
+        "Cassandra",
+        "Spanner"
+      ],
+      "tips": "Explain why network partitions (P) cannot be avoided, and break down PACELC: If Partition (P) trade A vs C; Else (E) trade Latency (L) vs Consistency (C).",
+      "model_answer": "The CAP theorem states that distributed data stores over physical networks must tolerate network partitions (P); when a partition occurs, the system must choose between Consistency (linearizable reads reflecting the latest write) or Availability (every non-failing node returns a non-error response). The PACELC theorem expands CAP to normal operations: If there is a Partition (P), trade Availability (A) vs Consistency (C); Else (E), trade Latency (L) vs Consistency (C). For instance, Apache Cassandra is a PA/EL system—prioritizing availability during splits and low latency during normal conditions through eventual consistency and tunable quorum reads/writes (R + W > N). Conversely, systems like Google Cloud Spanner operate as CP/EC systems, ensuring strict serializability and external consistency using synchronized TrueTime atomic clocks."
+    },
+    {
+      "id": "se_15",
+      "text": "Compare the Factory, Strategy, and Observer design patterns. When would you use each to write maintainable code?",
+      "difficulty": "Easy",
+      "keywords": [
+        "factory",
+        "strategy",
+        "observer",
+        "design pattern",
+        "polymorphism",
+        "composition",
+        "open closed",
+        "publish subscribe",
+        "decoupling"
+      ],
+      "tips": "Categorize Factory as Creational, and Strategy and Observer as Behavioral. Give practical coding examples like payment gateways or event listeners.",
+      "model_answer": "These Gang of Four design patterns enforce the Open/Closed Principle through polymorphism and object composition. Factory (Creational) centralizes object creation without exposing instantiation logic to the client—for example, a NotificationFactory instantiating EmailNotification or SMSNotification based on config. Strategy (Behavioral) defines a family of interchangeable algorithms behind a common interface, allowing algorithmic behavior to change dynamically at runtime—such as swapping a PaymentStrategy between CreditCard, PayPal, or Crypto. Observer (Behavioral) establishes a one-to-many subscription model where an observable subject automatically notifies registered listeners of state changes without tight coupling, commonly used in event buses, pub/sub architectures, and reactive UI frameworks."
+    }
+  ],
+  "data_science": [
+    {
+      "id": "ds_1",
+      "text": "Explain the bias-variance tradeoff and how it affects model selection.",
+      "difficulty": "Medium",
+      "keywords": [
+        "bias",
+        "variance",
+        "overfitting",
+        "underfitting",
+        "regularization",
+        "complexity",
+        "generalization",
+        "cross-validation"
+      ],
+      "tips": "Define high bias as underfitting, high variance as overfitting, and discuss regularization techniques to find optimal balance.",
+      "model_answer": "The bias-variance tradeoff balances model simplification against sensitivity to noise. High bias implies an overly simple model that underfits training data and fails to capture underlying patterns. High variance implies an over-parameterized model that memorizes training noise and fails to generalize to unseen test data. The goal is to minimize total error (Bias squared + Variance + Irreducible error) using techniques like k-fold cross-validation, regularization (L1/L2), and ensemble methods like random forests."
+    },
+    {
+      "id": "ds_2",
+      "text": "What is gradient descent and what are its variants? How do you choose a learning rate?",
+      "difficulty": "Medium",
+      "keywords": [
+        "gradient",
+        "learning rate",
+        "stochastic",
+        "mini-batch",
+        "convergence",
+        "momentum",
+        "Adam",
+        "optimizer",
+        "epoch"
+      ],
+      "tips": "Differentiate Batch, Stochastic (SGD), and Mini-batch; explain adaptive optimizers like Adam and learning rate scheduling.",
+      "model_answer": "Gradient descent is an iterative optimization algorithm that updates model parameters in the direction of the negative gradient of the loss function. Batch GD evaluates the entire dataset per update (accurate but slow), Stochastic GD updates per single sample (fast with noisy convergence), while Mini-Batch GD balances efficiency and vectorization. Choosing a learning rate requires tuning: too high causes divergence, too low results in sluggish convergence. In practice, adaptive learning rate optimizers like Adam or learning rate schedulers (cosine annealing) are ideal."
+    },
+    {
+      "id": "ds_3",
+      "text": "How would you handle a highly imbalanced dataset for a classification task?",
+      "difficulty": "Hard",
+      "keywords": [
+        "SMOTE",
+        "oversampling",
+        "undersampling",
+        "class weight",
+        "precision",
+        "recall",
+        "F1",
+        "ROC",
+        "AUC",
+        "threshold"
+      ],
+      "tips": "Focus on metric choice (PR-AUC over accuracy), resampling methods (SMOTE, Tomek links), and cost-sensitive loss functions.",
+      "model_answer": "First, I avoid relying on accuracy and instead evaluate precision-recall curves, F1-scores, and PR-AUC. At the data level, I utilize synthetic oversampling such as SMOTE or ADASYN for the minority class alongside intelligent undersampling like Tomek links. At the algorithm level, I configure cost-sensitive loss functions or class weights (e.g. scale_pos_weight in XGBoost). Finally, I adjust the classification probability decision threshold to align with business tolerance for false positives versus false negatives."
+    },
+    {
+      "id": "ds_4",
+      "text": "Explain the difference between supervised, unsupervised, and reinforcement learning.",
+      "difficulty": "Easy",
+      "keywords": [
+        "labeled",
+        "unlabeled",
+        "reward",
+        "agent",
+        "clustering",
+        "classification",
+        "regression",
+        "policy",
+        "environment"
+      ],
+      "tips": "Clearly distinguish data inputs (labeled vs unlabeled vs trial-and-error rewards) and typical use cases for each paradigm.",
+      "model_answer": "Supervised learning trains on paired input-output labeled datasets to learn a mapping function for classification or regression tasks. Unsupervised learning analyzes unlabeled data to uncover latent structures, groupings, or representations through clustering (k-means) and dimensionality reduction (PCA). Reinforcement learning places an autonomous agent in a dynamic environment where it learns an optimal policy through trial-and-error interactions guided by cumulative reward signals."
+    }
+  ],
+  "product_management": [
+    {
+      "id": "pm_1",
+      "text": "How would you prioritize features for a product roadmap when you have limited engineering resources?",
+      "difficulty": "Medium",
+      "keywords": [
+        "RICE",
+        "impact",
+        "effort",
+        "user stories",
+        "stakeholder",
+        "backlog",
+        "OKR",
+        "KPI",
+        "MVP",
+        "sprint"
+      ],
+      "tips": "Demonstrate a structured quantitative framework like RICE or Kano, tie directly to company OKRs, and emphasize customer value.",
+      "model_answer": "I use the RICE scoring framework (Reach, Impact, Confidence, and Effort) aligned with company strategic OKRs. I calculate reach across active cohorts, gauge quantitative impact on key metrics, evaluate confidence through user research signals, and divide by engineering sprints. High-leverage quick wins are prioritized for early MVPs, and regular stakeholder alignment reviews ensure the team remains focused on customer retention and core value propositions rather than loud opinions."
+    },
+    {
+      "id": "pm_2",
+      "text": "Walk me through how you would define success metrics for a new feature launch.",
+      "difficulty": "Medium",
+      "keywords": [
+        "KPI",
+        "DAU",
+        "MAU",
+        "retention",
+        "conversion",
+        "A/B test",
+        "baseline",
+        "hypothesis",
+        "north star",
+        "engagement"
+      ],
+      "tips": "Structure metrics into North Star, Adoption/Engagement, Retention, and Guardrail/Counter metrics.",
+      "model_answer": "I organize metrics into a four-tier hierarchy: North Star, Adoption, Engagement, and Guardrails. For adoption, I track 7-day and 30-day feature discovery rates and onboarding completion. For engagement, I measure recurring interaction depth and impact on 30-day user retention cohorts. Crucially, I establish guardrail metrics\u2014such as page load latency, support ticket volume, or churn in adjacent flows\u2014to ensure the feature does not cannibalize existing platform health."
+    },
+    {
+      "id": "pm_3",
+      "text": "How do you gather and incorporate customer feedback into the product development process?",
+      "difficulty": "Easy",
+      "keywords": [
+        "user research",
+        "interview",
+        "survey",
+        "NPS",
+        "iteration",
+        "empathy",
+        "pain point",
+        "persona",
+        "feedback loop"
+      ],
+      "tips": "Combine quantitative telemetry (analytics, NPS, churn surveys) with qualitative insights (user interviews, customer success notes).",
+      "model_answer": "I combine continuous quantitative signals\u2014such as product telemetry, funnel drop-off analytics, and in-app CSAT surveys\u2014with deep qualitative customer discovery sessions. I maintain a customer feedback repository categorized by user persona and pain point severity. Insights are synthesized into problem statements rather than prescriptive feature requests, validating user journeys before engineering commits code."
+    }
+  ],
+  "behavioral": [
+    {
+      "id": "bh_1",
+      "text": "Tell me about a time you had to deal with a difficult team member. How did you handle the situation?",
+      "difficulty": "Medium",
+      "keywords": [
+        "communication",
+        "conflict",
+        "empathy",
+        "resolution",
+        "collaboration",
+        "feedback",
+        "compromise",
+        "outcome",
+        "STAR"
+      ],
+      "tips": "Always use the STAR format: Situation, Task, Action, Result. Emphasize active listening, constructive communication, and collaborative resolution.",
+      "model_answer": "In my previous role, a senior teammate and I disagreed fundamentally on our database migration strategy (Situation/Task). Rather than debating in code reviews, I scheduled a 1-on-1 coffee chat to listen to their architecture concerns and latency priorities (Action). We realized our goals were aligned on zero-downtime, but we had differing risk tolerances. We co-authored a benchmark spike comparing both approaches, agreed on clear evaluation criteria, and landed a phased hybrid migration that delivered zero downtime and 35% cost reduction (Result)."
+    },
+    {
+      "id": "bh_2",
+      "text": "Describe a project where you had to learn a new technology quickly. How did you approach it?",
+      "difficulty": "Easy",
+      "keywords": [
+        "learning",
+        "adaptability",
+        "deadline",
+        "resources",
+        "self-directed",
+        "documentation",
+        "mentorship",
+        "milestone",
+        "delivered"
+      ],
+      "tips": "Showcase structured self-direction: studying documentation, building proof-of-concept prototypes, seeking mentor feedback, and meeting project deadlines.",
+      "model_answer": "When our team decided to adopt Kafka for real-time stream processing with only three weeks before release, I had zero prior streaming experience. I deconstructed the goal into milestone spikes: first, mastering the official documentation and partitioning concepts; second, creating an isolated local proof-of-concept producer/consumer pipeline; and third, conducting peer reviews with an experienced platform architect. We deployed the production pipeline on schedule with 99.9% uptime, and I documented a team runbook."
+    },
+    {
+      "id": "bh_3",
+      "text": "Give an example of when you failed at something. What did you learn from it?",
+      "difficulty": "Hard",
+      "keywords": [
+        "accountability",
+        "reflection",
+        "growth",
+        "lesson",
+        "improvement",
+        "resilience",
+        "ownership",
+        "iterate",
+        "transparent"
+      ],
+      "tips": "Pick a genuine mistake, take full ownership without blaming others, explain the immediate remediation and long-term systemic safeguards.",
+      "model_answer": "Early in my career, I deployed an unindexed database query directly to production that caused a spike in CPU usage and an 18-minute outage for our analytics dashboard. I immediately owned the error, rolled back the migration, and resolved the issue within 20 minutes. Following the incident, I led a blameless post-mortem and implemented systemic safeguards: automated query explain plan checks in our CI/CD pipeline and comprehensive staging load tests. It taught me that rigorous operational tooling beats reliance on individual vigilance."
+    }
+  ],
+  "python_developer": [
+    {
+      "id": "py_1",
+      "text": "Can you explain the difference between lists and tuples in Python?",
+      "difficulty": "Easy",
+      "keywords": [
+        "mutable",
+        "immutable",
+        "syntax",
+        "memory",
+        "performance",
+        "hashable",
+        "ordered"
+      ],
+      "tips": "Address mutability, memory allocation (fixed-size over-allocation in lists), performance, and hashability for dict keys.",
+      "model_answer": "Lists are mutable sequences defined with square brackets that can be dynamically resized in place, whereas tuples are immutable sequences defined with parentheses whose elements cannot be modified once instantiated. Because tuples are fixed in size, Python optimizes them with tighter memory blocks and faster allocation. Tuples containing only hashable elements can serve as dictionary keys or set members, whereas mutable lists cannot."
+    },
+    {
+      "id": "py_2",
+      "text": "What are Python decorators and how do they work? Give an example use case.",
+      "difficulty": "Medium",
+      "keywords": [
+        "wrapper",
+        "closure",
+        "higher-order",
+        "function",
+        "syntax",
+        "AOP",
+        "logging",
+        "authentication",
+        "functools"
+      ],
+      "tips": "Explain that functions are first-class objects, closures wrap behavior, and functools.wraps preserves metadata.",
+      "model_answer": "In Python, functions are first-class citizens. A decorator is a higher-order function that takes another function as an argument, extends or alters its behavior using an internal wrapper closure, and returns the modified callable without altering the original source code. Using the @decorator syntax is syntactic sugar for func = decorator(func). A quintessential use case is request authentication or timing metrics where functools.wraps preserves docstrings and function metadata."
+    },
+    {
+      "id": "py_3",
+      "text": "Explain the Global Interpreter Lock (GIL) in Python and its implications for multithreading.",
+      "difficulty": "Hard",
+      "keywords": [
+        "GIL",
+        "thread",
+        "CPython",
+        "parallelism",
+        "I/O bound",
+        "CPU bound",
+        "multiprocessing",
+        "concurrency",
+        "race condition"
+      ],
+      "tips": "Clarify that GIL is specific to CPython memory management (reference counting), explain I/O-bound vs CPU-bound implications.",
+      "model_answer": "The Global Interpreter Lock (GIL) is a mutex in CPython that prevents multiple native OS threads from executing Python bytecode simultaneously, protecting CPython's reference counting memory management from race conditions. As a result, multithreading in Python provides concurrency for I/O-bound tasks (network requests, disk I/O) where threads release the GIL while waiting. However, for CPU-bound computations, true multi-core parallelism requires multiprocessing, external C-extensions, or sub-interpreters."
+    }
+  ],
+  "forensic_science": [
+    {
+      "id": "fs_1",
+      "text": "Walk me through the Phenol-Chloroform extraction method for DNA analysis.",
+      "difficulty": "Hard",
+      "keywords": [
+        "lysis",
+        "proteinase",
+        "centrifuge",
+        "aqueous",
+        "precipitation",
+        "ethanol",
+        "silica",
+        "phase",
+        "organic"
+      ],
+      "tips": "Explain cell lysis, organic phase separation (aqueous vs organic phase), and ethanol precipitation with wash steps.",
+      "model_answer": "Phenol-Chloroform extraction begins with cell lysis using a detergent like SDS and Proteinase K to digest cellular proteins and nucleases. Next, an equal volume of phenol-chloroform-isoamyl alcohol is added, and upon centrifugation, the mixture separates into an upper aqueous phase containing polar nucleic acids and a lower organic phase containing denatured proteins and lipids. The aqueous layer is carefully pipetted into a clean tube, followed by cold ethanol or isopropanol precipitation to precipitate high-molecular-weight DNA."
+    },
+    {
+      "id": "fs_2",
+      "text": "What is Locard's Exchange Principle and how does it apply to modern forensic investigations?",
+      "difficulty": "Medium",
+      "keywords": [
+        "transfer",
+        "trace evidence",
+        "contact",
+        "fibers",
+        "hair",
+        "soil",
+        "cross-transfer",
+        "persistence",
+        "scene"
+      ],
+      "tips": "State the principle: 'Every contact leaves a trace.' Discuss modern applications to microscopic trace evidence and digital forensics.",
+      "model_answer": "Locard's Exchange Principle asserts that with contact between two items, there will be an exchange of microscopic or physical material\u2014encapsulated as 'Every contact leaves a trace.' In modern forensic science, this underpins the identification and collection of trace evidence such as gunshot residue, transferred synthetic fibers, biological epithelial cells, and soil particulate. It also extends to digital forensics, where any interaction with an electronic device leaves transactional metadata, timestamps, and network artifacts."
+    }
+  ]
+}

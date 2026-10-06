@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice Session History — AI Mock Interview Assistant</title>
+  <meta name="description" content="Review your comprehensive interview session history, multi-tier score breakdowns, sentiment and confidence analytics, and improvement advice." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: rgba(17, 23, 38, 0.84);
+      --surface2: rgba(24, 34, 56, 0.78);
+      --surface3: rgba(34, 48, 78, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-g: #8b5cf6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #64748b;
+      --text-sub: #94a3b8;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background-color: #080c15;
+      background-image: 
+        radial-gradient(ellipse at 50% 20%, rgba(9, 13, 22, 0.45) 0%, rgba(9, 13, 22, 0.82) 100%),
+        url('/static/wallpaper.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .bg-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .glow-orb { position: absolute; border-radius: 50%; filter: blur(110px); opacity: 0.09; }
+    .orb-1 { width: 450px; height: 450px; background: var(--primary); top: -100px; left: -80px; }
+    .orb-2 { width: 400px; height: 400px; background: var(--accent); bottom: -80px; right: -80px; }
+
+    .app-shell { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Navbar */
+    header.navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 36px; background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text);
+      font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em;
+    }
+    .brand-badge {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-g));
+      display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+    }
+    .nav-links { display: flex; gap: 10px; align-items: center; }
+    .nav-item {
+      padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600;
+      color: var(--text-sub); text-decoration: none; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--text); background: rgba(255, 255, 255, 0.05); border-color: var(--border);
+    }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15));
+      border-color: rgba(99, 102, 241, 0.35); color: var(--text);
+    }
+
+    .btn {
+      font-family: inherit; font-size: 0.875rem; font-weight: 600; padding: 9px 18px;
+      border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-g)); color: white; }
+    .btn-ghost { background: transparent; color: var(--text-sub); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--primary); color: var(--text); background: rgba(99,102,241,0.08); }
+    .btn-danger { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.22); }
+
+    /* Layout */
+    .history-container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 64px; width: 100%; }
+
+    .header-row {
+      display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+    }
+    .header-row h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
+    .header-row p { color: var(--text-sub); font-size: 0.95rem; }
+
+    /* Filter & Search Bar */
+    .search-filter-bar {
+      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); padding: 14px 18px; border-radius: var(--radius);
+    }
+    .search-input {
+      flex: 2; min-width: 200px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 0.875rem; outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .filter-select {
+      flex: 1; min-width: 140px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 0.875rem; outline: none;
+    }
+
+    /* History Cards List */
+    .history-list { display: flex; flex-direction: column; gap: 16px; }
+    .history-card {
+      background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 22px; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .history-card:hover { border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+    .card-top {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px;
+    }
+    .card-q-text { font-size: 1.05rem; font-weight: 700; color: var(--text); line-height: 1.5; flex: 1; }
+    .card-score-badge {
+      width: 56px; height: 56px; border-radius: 50%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; flex-shrink: 0;
+    }
+    .card-score-badge .pct { font-size: 0.55rem; opacity: 0.7; }
+    .score-high { background: rgba(16,185,129,0.15); border: 2px solid rgba(16,185,129,0.4); color: var(--success); }
+    .score-mid  { background: rgba(99,102,241,0.15); border: 2px solid rgba(99,102,241,0.4); color: var(--primary-light); }
+    .score-low  { background: rgba(239,68,68,0.12); border: 2px solid rgba(239,68,68,0.35); color: var(--danger); }
+
+    .meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+    .meta-tag {
+      font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text-sub);
+    }
+
+    .user-ans-preview {
+      background: var(--surface2); border-left: 3px solid var(--primary); padding: 12px 16px;
+      border-radius: 6px; font-size: 0.88rem; color: var(--text-sub); line-height: 1.55; margin-bottom: 14px;
+      font-style: italic;
+    }
+
+    /* Expandable Details */
+    .expand-toggle {
+      font-size: 0.8rem; font-weight: 700; color: var(--primary-light); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; user-select: none;
+    }
+    .expand-toggle:hover { text-decoration: underline; }
+
+    .details-pane {
+      margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); display: none;
+    }
+    .details-pane.open { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .breakdown-strip {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;
+    }
+    .b-cell {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+    }
+    .b-cell-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .b-cell-val { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+
+    .point-section { margin-bottom: 14px; }
+    .point-section h5 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+    /* Empty */
+    .empty-history { text-align: center; padding: 60px 24px; color: var(--text-muted); }
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+    footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: auto; }
+  </style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+</div>
+
+<div class="app-shell">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <img src="/static/logo.svg" alt="Logo" width="40" height="40" style="border-radius:12px;box-shadow:var(--glow);flex-shrink:0;" />
+      <span>AI Mock Interview Assistant</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/" class="nav-item">🎯 Practice</a>
+      <a href="/dashboard" class="nav-item">📈 Progress Dashboard</a>
+      <a href="/history" class="nav-item active">📊 History</a>
+      <a href="/api/history/export" class="btn btn-ghost">⬇ Export JSON</a>
+    </nav>
+  </header>
+
+  <!-- History Container -->
+  <div class="history-container">
+
+    <div class="header-row">
+      <div>
+        <h1>📊 Practice Session History</h1>
+        <p>Review comprehensive feedback, multi-tier scoring, candidate sentiment, and model answers.</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-danger" onclick="clearAllHistory()">🗑 Clear History</button>
+        <a href="/" class="btn btn-primary">+ New Practice</a>
+      </div>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="search-filter-bar">
+      <input type="text" class="search-input" id="search-input" placeholder="🔍 Search question, response, or feedback keywords..." oninput="filterHistory()" />
+      <select class="filter-select" id="domain-filter" onchange="filterHistory()">
+        <option value="all">All Domains</option>
+        <option value="software_engineering">Software Engineering</option>
+        <option value="data_science">Data Science</option>
+        <option value="product_management">Product Management</option>
+        <option value="behavioral">Behavioral</option>
+        <option value="python_developer">Python Developer</option>
+        <option value="forensic_science">Forensic Science</option>
+      </select>
+      <select class="filter-select" id="grade-filter" onchange="filterHistory()">
+        <option value="all">All Grades</option>
+        <option value="Excellent">Excellent (85%+)</option>
+        <option value="Good">Good (70-84%)</option>
+        <option value="Fair">Fair (50-69%)</option>
+        <option value="Needs Improvement">Needs Improvement (&lt;50%)</option>
+      </select>
+      <select class="filter-select" id="sort-order" onchange="filterHistory()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="highest">Highest Score</option>
+        <option value="lowest">Lowest Score</option>
+      </select>
+    </div>
+
+    <!-- List -->
+    <div class="history-list" id="history-list"></div>
+
+  </div>
+
+  <footer style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:34px 24px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.84rem;text-align:center;">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);font-size:1rem;flex-wrap:wrap;justify-content:center;">
+      <img src="/static/logo.svg" alt="Logo" width="28" height="28" style="border-radius:8px;" />
+      <span>AI Mock Interview Assistant</span>
+      <span style="opacity:0.35;">||</span>
+      <span style="color:var(--primary-light);">DATA ALCOTT || SYSTEMS</span>
+    </div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;font-size:0.82rem;align-items:center;">
+      <a href="https://www.dataalcott.com/" target="_blank" rel="noopener noreferrer" style="color:var(--text-sub);text-decoration:none;">DATA ALCOTT SYSTEMS</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="https://www.freeinternships.in/" target="_blank" rel="noopener noreferrer" style="color:var(--text-sub);text-decoration:none;">www.freeinternships.in</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="tel:9600095045" style="color:var(--text-sub);text-decoration:none;">📞 9600095045</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="mailto:mail@freeinternships.in" style="color:var(--text-sub);text-decoration:none;">✉️ mail@freeinternships.in</a>
+      <span style="opacity:0.3;">•</span>
+      <a href="https://www.freeinternships.in/register.php" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700;text-decoration:none;">🎓 Free Online AI &amp; Data Science Internship - Apply Now!</a>
+    </div>
+    <div style="font-size:0.75rem;opacity:0.7;">
+      AI Mock Interview Assistant — Powered by Google Gemini AI &amp; spaCy NLP • <a href="/dashboard" style="color:var(--primary-light);text-decoration:none;">View Dashboard</a> • <a href="/" style="color:var(--primary-light);text-decoration:none;">Practice Mode</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+let fullHistory = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadHistoryData();
+});
+
+async function loadHistoryData() {
+  try {
+    const res = await fetch('/api/history');
+    fullHistory = await res.json();
+    renderHistoryCards(fullHistory);
+  } catch (e) {
+    document.getElementById('history-list').innerHTML = `
+      <div class="empty-history">
+        <div class="empty-icon">⚠️</div>
+        <h3>Failed to load history</h3>
+      </div>
+    `;
+  }
+}
+
+function filterHistory() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  const domain = document.getElementById('domain-filter').value;
+  const grade = document.getElementById('grade-filter').value;
+  const sort = document.getElementById('sort-order').value;
+
+  let filtered = fullHistory.filter(item => {
+    if (domain !== 'all' && item.domain !== domain) return false;
+    if (grade !== 'all' && item.grade !== grade) return false;
+    if (query) {
+      const q = (item.question || '').toLowerCase();
+      const r = (item.response || '').toLowerCase();
+      const f = (item.feedback || '').toLowerCase();
+      if (!q.includes(query) && !r.includes(query) && !f.includes(query)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  if (sort === 'oldest') {
+    filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  } else if (sort === 'highest') {
+    filtered.sort((a, b) => (b.score || 0) - (a.score || 0));
+  } else if (sort === 'lowest') {
+    filtered.sort((a, b) => (a.score || 0) - (b.score || 0));
+  } else {
+    filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }
+
+  renderHistoryCards(filtered);
+}
+
+function renderHistoryCards(items) {
+  const container = document.getElementById('history-list');
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="empty-history">
+        <div class="empty-icon">📭</div>
+        <h3>No practice sessions match your filters</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);margin-top:6px;">Start a new interview session to build your record!</p>
+      </div>
+    `;
+    return;
+  }
+
+  const domainIcons = {
+    software_engineering: '💻', data_science: '📊', product_management: '🗂️',
+    behavioral: '🧠', python_developer: '🐍', forensic_science: '🔬',
+  };
+
+  container.innerHTML = items.map((item, idx) => {
+    const score = item.score !== undefined ? item.score : 0;
+    const scoreClass = score >= 75 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
+    const icon = domainIcons[item.domain] || '📁';
+    const domainLabel = item.domain_label || (item.domain || '').replace(/_/g, ' ').toUpperCase();
+    const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString() : '—';
+    const grade = item.grade || 'N/A';
+
+    const b = item.score_breakdown || {};
+    const kw = b.keyword_coverage?.score !== undefined ? `${b.keyword_coverage.score}/25` : '—';
+    const tech = b.technical_depth?.score !== undefined ? `${b.technical_depth.score}/35` : '—';
+    const comm = b.communication_structure?.score !== undefined ? `${b.communication_structure.score}/20` : '—';
+    const conf = b.confidence_delivery?.score !== undefined ? `${b.confidence_delivery.score}/20` : '—';
+
+    const sent = item.sentiment?.label || 'Balanced & Professional';
+    const confScore = item.confidence?.score !== undefined ? `${item.confidence.score}% (${item.confidence.level || 'Moderate'})` : '75% (Moderate)';
+
+    // Speech & STAR data
+    const speech = item.speech_analysis || {};
+    const wpm = speech.wpm || (item.wpm !== undefined ? item.wpm : 135);
+    const paceLabel = speech.pace_label || 'Optimal Cadence';
+    const durationSec = speech.duration_seconds || item.duration_seconds || 45;
+    const fpm = speech.fillers_per_minute !== undefined ? speech.fillers_per_minute : 0;
+    const energyScore = speech.delivery_energy_score || 80;
+    const vocalAdvice = speech.vocal_advice || '';
+
+    const star = item.star_analysis || {};
+    const starScore = star.star_score !== undefined ? star.star_score : (item.star_score || 75);
+    const starDetected = star.detected || {};
+
+    const rel = item.relevance || {};
+    const impact = item.impact_analysis || {};
+
+    return `
+      <div class="history-card">
+        <div class="card-top">
+          <div class="card-q-text">${item.question || 'Interview Question'}</div>
+          <div class="card-score-badge ${scoreClass}">
+            ${score}<span class="pct">/ 100</span>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <span class="meta-tag">${icon} ${domainLabel}</span>
+          <span class="meta-tag">🏅 Grade: ${grade}</span>
+          <span class="meta-tag" style="color:var(--accent);">🎙️ ${wpm} WPM (${paceLabel})</span>
+          <span class="meta-tag" style="color:var(--warning);">⭐ STAR: ${starScore}%</span>
+          <span class="meta-tag">⏱️ ${durationSec}s</span>
+          <span class="meta-tag">💬 Tone: ${sent}</span>
+          <span class="meta-tag">⚡ Conviction: ${energyScore}%</span>
+          <span class="meta-tag">📅 ${dateStr}</span>
+        </div>
+
+        <div class="user-ans-preview">
+          "${(item.response || '').substring(0, 220)}${(item.response || '').length > 220 ? '…' : ''}"
+        </div>
+
+        <div style="font-size:0.9rem;color:var(--text);line-height:1.55;margin-bottom:12px;">
+          <strong style="color:var(--primary-light);">Interviewer Feedback:</strong> ${item.feedback || 'Good effort.'}
+        </div>
+
+        <span class="expand-toggle" onclick="toggleDetails(${idx})">
+          <span id="chevron-${idx}">▼</span> <span id="label-${idx}">View Diagnostics, Speech Coaching & Model Answer</span>
+        </span>
+
+        <div class="details-pane" id="pane-${idx}">
+          <!-- Breakdown Strip -->
+          <div class="breakdown-strip">
+            <div class="b-cell">
+              <div class="b-cell-title">🎯 Keywords</div>
+              <div class="b-cell-val">${kw}</div>
+            </div>
+            <div class="b-cell">
+              <div class="b-cell-title">🔬 Technical Depth</div>
+              <div class="b-cell-val">${tech}</div>
+            </div>
+            <div class="b-cell">
+              <div class="b-cell-title">🗣️ Communication</div>
+              <div class="b-cell-val">${comm}</div>
+            </div>
+            <div class="b-cell">
+              <div class="b-cell-title">⚡ Delivery</div>
+              <div class="b-cell-val">${conf}</div>
+            </div>
+          </div>
+
+          <!-- Speech & STAR Diagnostics Strip -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px;">
+            <div class="b-cell" style="background:rgba(6,182,212,0.06);border-color:rgba(6,182,212,0.25);">
+              <div class="b-cell-title" style="color:var(--accent);">🎙️ Speech Delivery</div>
+              <div style="font-size:0.85rem;color:var(--text);margin-top:2px;">
+                <strong>${wpm} WPM</strong> • ${fpm} FPM filler rate • ${energyScore}% energy
+              </div>
+              ${vocalAdvice ? `<div style="font-size:0.75rem;color:var(--text-sub);margin-top:4px;">Advice: ${vocalAdvice}</div>` : ''}
+            </div>
+
+            <div class="b-cell" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.25);">
+              <div class="b-cell-title" style="color:var(--warning);">⭐ STAR Compliance (${starScore}%)</div>
+              <div style="display:flex;gap:6px;margin-top:4px;font-size:0.75rem;font-weight:700;">
+                <span style="color:${starDetected.s ? 'var(--success)' : 'var(--text-muted)'};">[S: ${starDetected.s ? '✓' : '⚠️'}]</span>
+                <span style="color:${starDetected.t ? 'var(--success)' : 'var(--text-muted)'};">[T: ${starDetected.t ? '✓' : '⚠️'}]</span>
+                <span style="color:${starDetected.a ? 'var(--success)' : 'var(--text-muted)'};">[A: ${starDetected.a ? '✓' : '⚠️'}]</span>
+                <span style="color:${starDetected.r ? 'var(--success)' : 'var(--text-muted)'};">[R: ${starDetected.r ? '✓' : '⚠️'}]</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text-sub);margin-top:4px;">
+                Relevance: ${rel.score || 85}% • ${(impact.has_quantified_impact || impact.has_metrics) ? 'Quantified Impact Grounded' : 'Qualitative'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Strengths -->
+          ${(item.strengths && item.strengths.length) ? `
+            <div class="point-section">
+              <h5 style="color:var(--success);">✅ Strengths Identified</h5>
+              <div style="display:flex;flex-direction:column;gap:4px;font-size:0.85rem;color:var(--text-sub);">
+                ${item.strengths.map(s => `<div>✓ ${s}</div>`).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Improvements -->
+          ${(item.improvements && item.improvements.length) ? `
+            <div class="point-section">
+              <h5 style="color:var(--warning);">🎯 Improvement Recommendations</h5>
+              <div style="display:flex;flex-direction:column;gap:4px;font-size:0.85rem;color:var(--text-sub);">
+                ${item.improvements.map(i => `<div>→ ${i}</div>`).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Model Answer -->
+          ${item.model_answer ? `
+            <div class="point-section" style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);padding:14px;border-radius:8px;">
+              <h5 style="color:var(--primary-light);">🏆 Reference Benchmark Answer</h5>
+              <p style="font-size:0.85rem;color:var(--text-sub);line-height:1.55;margin-top:4px;">${item.model_answer}</p>
+            </div>
+          ` : ''}
+
+          <!-- Probing Follow Up -->
+          ${item.follow_up ? `
+            <div class="point-section" style="margin-top:10px;">
+              <h5 style="color:var(--accent);">🎤 Interviewer Follow-Up</h5>
+              <p style="font-size:0.85rem;color:var(--text);font-style:italic;">"${item.follow_up}"</p>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleDetails(idx) {
+  const pane = document.getElementById(`pane-${idx}`);
+  const chevron = document.getElementById(`chevron-${idx}`);
+  const label = document.getElementById(`label-${idx}`);
+  if (pane.classList.contains('open')) {
+    pane.classList.remove('open');
+    chevron.textContent = '▼';
+    label.textContent = 'View Full Evaluation & Model Answer';
+  } else {
+    pane.classList.add('open');
+    chevron.textContent = '▲';
+    label.textContent = 'Hide Full Evaluation';
+  }
+}
+
+async function clearAllHistory() {
+  if (!confirm('Are you sure you want to clear all practice session history? This cannot be undone.')) return;
+  await fetch('/api/history/clear', { method: 'POST' });
+  fullHistory = [];
+  renderHistoryCards([]);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+[
+  {
+    "id": "sess_1791321884324",
+    "timestamp": "2026-10-07T02:54:44.324353",
+    "domain": "software_engineering",
+    "domain_label": "Software Engineering",
+    "question_id": "se_1",
+    "question": "Explain the SOLID principles and give an example of how you've applied one in a real project.",
+    "response": "l",
+    "score": 18,
+    "grade": "Needs Improvement",
+    "score_breakdown": {
+      "keyword_coverage": {
+        "score": 0.0,
+        "max": 25,
+        "pct": 0
+      },
+      "technical_depth": {
+        "score": 0.0,
+        "max": 35,
+        "pct": 0
+      },
+      "communication_structure": {
+        "score": 7.0,
+        "max": 20,
+        "pct": 35
+      },
+      "confidence_delivery": {
+        "score": 11.4,
+        "max": 20,
+        "pct": 57
+      }
+    },
+    "sentiment": {
+      "polarity": 0.0,
+      "subjectivity": 0.0,
+      "label": "Objective & Balanced",
+      "tone": "Analytical",
+      "description": "Data-driven, precise, and highly professional."
+    },
+    "confidence": {
+      "score": 57,
+      "level": "Needs Conviction",
+      "filler_count": 0,
+      "hesitation_count": 0,
+      "advice": "Focus on replacing hedging phrases ('I think', 'maybe') with active declarations ('I designed', 'we solved')."
+    },
+    "speech_analysis": {
+      "duration_seconds": 6.0,
+      "is_estimated_duration": true,
+      "wpm": 10,
+      "pace_label": "Deliberate / Slow",
+      "pace_status": "warning",
+      "pace_advice": "Your pacing is 10 WPM (ideal is 120-160 WPM). Aim to speak with more momentum and vocal energy to keep the interviewer engaged.",
+      "vocal_advice": "Your pacing is 10 WPM (ideal is 120-160 WPM). Aim to speak with more momentum and vocal energy to keep the interviewer engaged.",
+      "fpm": 0.0,
+      "fillers_per_minute": 0.0,
+      "filler_density_pct": 0.0,
+      "filler_rating": "Pristine",
+      "filler_status": "success",
+      "filler_count": 0,
+      "energy_score": 66,
+      "delivery_energy_score": 66,
+      "energy_level": "Tentative / Needs Conviction",
+      "hesitation_count": 0,
+      "assertive_count": 0
+    },
+    "star_analysis": {
+      "score": 0,
+      "star_score": 0,
+      "components": {
+        "situation": {
+          "detected": false,
+          "label": "Situation / Context"
+        },
+        "task": {
+          "detected": false,
+          "label": "Task / Objective"
+        },
+        "action": {
+          "detected": false,
+          "label": "Action / Execution"
+        },
+        "result": {
+          "detected": false,
+          "label": "Result / Impact"
+        }
+      },
+      "detected": {
+        "s": false,
+        "t": false,
+        "a": false,
+        "r": false
+      },
+      "detected_count": 0,
+      "feedback": "Consider framing this scenario with the STAR method (Situation -> Task -> Action -> Measurable Result)."
+    },
+    "impact_analysis": {
+      "has_metrics": false,
+      "has_quantified_impact": false,
+      "count": 0,
+      "metric_count": 0,
+      "metrics": [],
+      "score": 0,
+      "advice": "No explicit numbers or percentages detected. Top candidates quantify results (e.g., 'reduced latency by 35%', 'scaled to 50k QPS')."
+    },
+    "relevance": {
+      "score": 25,
+      "label": "Partially Tangential",
+      "description": "Answer addresses some points but drifts away from the primary problem statement.",
+      "prompt_terms_addressed": []
+    },
+    "duration_seconds": 6.0,
+    "wpm": 10,
+    "feedback": "Your response was incomplete, consisting of a single keystroke rather than an explanation of the SOLID principles. To succeed in senior engineering interviews, you must clearly define all five principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion) and provide a concrete production example using the STAR method.",
+    "strengths": [
+      "No filler words were used during the attempt.",
+      "Recognized the question prompt immediately."
+    ],
+    "improvements": [
+      "Prepare a structured, multi-sentence response defining each of the five SOLID principles clearly.",
+      "Outline a specific production scenario using the STAR framework to demonstrate how you applied one of these principles, such as the Open/Closed Principle or Dependency Inversion."
+    ],
+    "recommendations": [
+      "Object-Oriented Design Principles (SOLID)",
+      "Dependency Injection and Inversion of Control (IoC)"
+    ],
+    "model_answer": "The SOLID principles are five design guidelines for writing maintainable and scalable software: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion. In a recent project, I applied the Dependency Inversion Principle by refactoring a tightly coupled notification service to depend on an abstraction (INotificationService) rather than a concrete SMTP implementation, which made our unit testing straightforward and allowed us to swap email providers seamlessly.",
+    "follow_up": "Can you walk me through an example where violating the Liskov Substitution Principle caused a bug in a codebase you worked on, and how you fixed it?",
+    "matched": [],
+    "missing": [
+      "single responsibility",
+      "open closed",
+      "liskov",
+      "interface segregation",
+      "dependency inversion",
+      "design",
+      "principle"
+    ],
+    "word_count": 1,
+    "engine": "gemini-ai"
+  }
+]
