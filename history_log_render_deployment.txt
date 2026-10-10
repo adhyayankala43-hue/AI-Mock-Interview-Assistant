@@ -1,0 +1,50 @@
+2026-10-10T02:04:35.987214574Z Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+2026-10-10T02:04:35.995868948Z Downloading smart_open-7.7.1-py3-none-any.whl (65 kB)
+2026-10-10T02:04:35.998552049Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 65.1/65.1 kB 41.7 MB/s eta 0:00:00
+2026-10-10T02:04:36.002732884Z Downloading typer_slim-0.24.0-py3-none-any.whl (3.4 kB)
+2026-10-10T02:04:36.007175838Z Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+2026-10-10T02:04:36.011910566Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-10-10T02:04:36.015114033Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 135.7/135.7 kB 74.9 MB/s eta 0:00:00
+2026-10-10T02:04:36.018599816Z Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+2026-10-10T02:04:36.023363211Z Downloading joblib-1.6.0-py3-none-any.whl (306 kB)
+2026-10-10T02:04:36.026905934Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 306.1/306.1 kB 147.0 MB/s eta 0:00:00
+2026-10-10T02:04:36.030256254Z Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (217 kB)
+2026-10-10T02:04:36.033600991Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 217.8/217.8 kB 113.0 MB/s eta 0:00:00
+2026-10-10T02:04:36.036893638Z Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+2026-10-10T02:04:36.041780771Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2026-10-10T02:04:36.046936981Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+2026-10-10T02:04:36.049734288Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 91.7/91.7 kB 55.8 MB/s eta 0:00:00
+2026-10-10T02:04:36.053126091Z Downloading pyasn1-0.6.4-py3-none-any.whl (84 kB)
+2026-10-10T02:04:36.055944729Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 84.4/84.4 kB 51.3 MB/s eta 0:00:00
+2026-10-10T02:04:36.059547128Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-10T02:04:36.066885722Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 215.9 MB/s eta 0:00:00
+2026-10-10T02:04:36.070873014Z Downloading wrapt-2.5.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (239 kB)
+2026-10-10T02:04:36.074389779Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 239.8/239.8 kB 118.0 MB/s eta 0:00:00
+2026-10-10T02:04:36.078168894Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+2026-10-10T02:04:36.083366011Z Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-10T02:04:36.090372764Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.2/51.2 kB 7.3 MB/s eta 0:00:00
+2026-10-10T02:04:36.587709892Z Installing collected packages: wrapt, websockets, wasabi, urllib3, typing-extensions, tqdm, tenacity, spacy-loggers, spacy-legacy, sniffio, shellingham, regex, python-dotenv, pygments, pycparser, pyasn1, packaging, numpy, murmurhash, mdurl, markupsafe, langcodes, itsdangerous, idna, h11, gunicorn, distro, defusedxml, cymem, cloudpickle, cloudpathlib, click, charset_normalizer, certifi, catalogue, blinker, annotated-types, annotated-doc, werkzeug, typing-inspection, srsly, smart-open, requests, pydantic-core, pyasn1-modules, preshed, markdown-it-py, joblib, jinja2, httpcore, cffi, blis, anyio, rich, pydantic, nltk, httpx, flask, cryptography, typer, textblob, groq, google-auth, confection, typer-slim, thinc, weasel, google-genai, spacy, en-core-web-sm
+2026-10-10T02:04:45.228981999Z Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 blinker-1.9.0 blis-0.7.11 catalogue-2.0.10 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.5.2 click-8.5.0 cloudpathlib-0.26.0 cloudpickle-3.1.2 confection-0.1.5 cryptography-50.0.2 cymem-2.0.13 defusedxml-0.7.1 distro-1.9.0 en-core-web-sm-3.7.1 flask-3.1.3 google-auth-2.61.0 google-genai-2.29.0 groq-1.7.0 gunicorn-26.2.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 itsdangerous-2.2.0 jinja2-3.1.6 joblib-1.6.0 langcodes-3.5.1 markdown-it-py-4.2.0 markupsafe-3.0.4 mdurl-0.1.2 murmurhash-1.0.15 nltk-3.10.3 numpy-1.26.4 packaging-26.3 preshed-3.0.13 pyasn1-0.6.4 pyasn1-modules-0.4.2 pycparser-3.11 pydantic-2.14.0 pydantic-core-2.50.0 pygments-2.21.0 python-dotenv-1.2.4 regex-2026.9.29 requests-2.34.2 rich-15.0.0 shellingham-1.5.4 smart-open-7.7.1 sniffio-1.3.1 spacy-3.7.5 spacy-legacy-3.0.12 spacy-loggers-1.0.5 srsly-2.5.4 tenacity-9.1.4 textblob-0.20.1 thinc-8.2.5 tqdm-4.70.1 typer-0.27.3 typer-slim-0.24.0 typing-extensions-4.16.0 typing-inspection-0.4.4 urllib3-2.8.0 wasabi-1.1.3 weasel-0.4.3 websockets-16.1.1 werkzeug-3.1.9 wrapt-2.5.0
+2026-10-10T02:04:45.382477327Z 
+2026-10-10T02:04:45.382493174Z [notice] A new release of pip is available: 24.0 -> 26.2.1
+2026-10-10T02:04:45.382495702Z [notice] To update, run: pip install --upgrade pip
+2026-10-10T02:04:47.78537269Z ==> Uploading build...
+2026-10-10T02:04:54.813737618Z ==> Uploaded in 5.1s. Compression took 1.9s
+2026-10-10T02:04:54.817262041Z ==> Build successful 🎉
+2026-10-10T02:04:56.622573771Z ==> Deploying...
+2026-10-10T02:04:56.837388585Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-10-10T02:05:18.121069146Z ==> Running 'gunicorn app:app'
+2026-10-10T02:05:47.517580817Z [2026-10-10 02:05:47 +0000] [57] [INFO] Starting gunicorn 26.2.0
+2026-10-10T02:05:47.519099137Z [2026-10-10 02:05:47 +0000] [57] [INFO] Listening at: http://0.0.0.0:10000 (57)
+2026-10-10T02:05:47.519115717Z [2026-10-10 02:05:47 +0000] [57] [INFO] Using worker: sync
+2026-10-10T02:05:47.612661015Z [2026-10-10 02:05:47 +0000] [65] [INFO] Booting worker with pid: 65
+2026-10-10T02:05:47.716528658Z [2026-10-10 02:05:47 +0000] [57] [INFO] Control socket listening at /opt/render/.gunicorn/gunicorn.ctl
+2026-10-10T02:05:48.715503542Z 127.0.0.1 - - [10/Oct/2026:02:05:48 +0000] "HEAD / HTTP/1.1" 200 0 "-" "Go-http-client/1.1"
+2026-10-10T02:05:57.346250974Z ==> Your service is live 🎉
+2026-10-10T02:05:57.455027545Z 127.0.0.1 - - [10/Oct/2026:02:05:57 +0000] "GET / HTTP/1.1" 200 102842 "-" "Go-http-client/2.0"
+2026-10-10T02:05:57.557432665Z ==> 
+2026-10-10T02:05:57.559908862Z ==> ///////////////////////////////////////////////////////////
+2026-10-10T02:05:57.566126014Z ==> 
+2026-10-10T02:05:57.568212471Z ==> Available at your primary URL https://ai-mock-interview-assistant-rxdu.onrender.com
+2026-10-10T02:05:57.570381871Z ==> 
+2026-10-10T02:05:57.572463578Z ==> ///////////////////////////////////////////////////////////
